@@ -15,12 +15,30 @@ jobs:
       - name: Clone the project
         uses: actions/checkout@v3
       
-      - name: Cheking for Frontend project
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ds.pem
+          chmod 600 ~/.ssh/ds.pem
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Building Frontend
         run: |
           cd ./frontend
-          ls
+          npm i
+          npm run build
       
-      - name: Cheking for Backend project
+      - name: Frontend Deployment
         run: |
-          cd ./backend
-          ls
+          rsync -avz --delete -e "ssh -i ~/.ssh/ds.pem" ./frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/frontend/
+          ssh -i "~/.ssh/ds.pem" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} <<EOF
+            sudo rm -rf /var/www/html/*
+            sudo cp -r /home/${{ secrets.SERVER_USER }}/frontend/* /var/www/html/
+            sudo systemctl restart nginx
+          EOF
+      
