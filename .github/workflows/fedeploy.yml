@@ -17,8 +17,10 @@ jobs:
       
       - name: Cheking for Frontend project
         run: |
-          ls ./frontend
+          cd ./frontend
+          ls
       
       - name: Cheking for Backend project
         run: |
-          ls ./backend
+          cd ./backend
+          ls
