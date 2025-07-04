@@ -15,7 +15,12 @@ jobs:
       - name: Clone the project
         uses: actions/checkout@v3
       
-      - name: Cheking for Cloned project
+      - name: Cheking for Frontend project
         run: |
           ls ./frontend
+          EOF
+      
+      - name: Cheking for Backend project
+        run: |
+          ls ./backend
           EOF
