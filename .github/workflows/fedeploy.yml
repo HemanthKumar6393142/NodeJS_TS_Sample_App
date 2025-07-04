@@ -1,0 +1,19 @@
+name: NodeJS TS Frontend Application Deployment
+
+on:
+  push:
+    branches: [main]  # Change to your branch
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    environment: production # 🔐 Enables environment-specific secrets
+
+    steps:
+      - name: Clone the project
+        uses: actions/checkout@v3
+        run: |
+          ls ./
+          EOF
