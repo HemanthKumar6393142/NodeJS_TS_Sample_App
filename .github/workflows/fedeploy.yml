@@ -1,4 +1,4 @@
-name: NodeJS TS Frontend Application Deployment
+name: NodeJS TS Frontend Application Deployment via Nginx
 
 on:
   push:
@@ -41,9 +41,12 @@ jobs:
       - name: Frontend Deployment
         run: |
           rsync -avz --delete -e "ssh -i ~/.ssh/ds.pem" ./frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/frontend/
-          ssh -i "~/.ssh/ds.pem" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} <<EOF
+          ssh -i ~/.ssh/ds.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} <<EOF
             sudo rm -rf /var/www/html/*
             sudo cp -r /home/${{ secrets.SERVER_USER }}/frontend/* /var/www/html/
             sudo systemctl restart nginx
           EOF
       
+      - name: Cleanup SSH key
+        run: rm -f ~/.ssh/ds.pem
+
