@@ -31,9 +31,13 @@ jobs:
             
       - name: Creating PM2 config file to pass .env content
         env:
-          BE_ENV_NON_SEN_DATA: ${{ vars.BE_ENV_NON_SEN_DATA }}
-          BE_ENV_SEN_DATA: ${{ secrets.BE_ENV_SEN_DATA }}
+          RAW_NON_SEN: ${{ vars.BE_ENV_NON_SEN_DATA }}
+          RAW_SEN: ${{ secrets.BE_ENV_SEN_DATA }}
         run: |
+          # Indent the multiline values and store them
+          NON_SEN=$(echo "$RAW_NON_SEN" | sed 's/^/      /')
+          SEN=$(echo "$RAW_SEN" | sed 's/^/      /')
+          # Now write the config with correct indentation
           cat <<EOF > ./backend/ecosystem.config.js
           module.exports = {
             apps: [
@@ -41,8 +45,8 @@ jobs:
                 name: 'backend',
                 script: 'dist/server.js',
                 env: {
-                  ${BE_ENV_NON_SEN_DATA}
-                  ${BE_ENV_SEN_DATA}
+          $NON_SEN
+          $SEN
                 }
               }
             ]
