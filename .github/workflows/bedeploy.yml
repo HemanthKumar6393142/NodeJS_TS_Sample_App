@@ -30,6 +30,9 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
             
       - name: Creating PM2 config file to pass .env content
+        env:
+          BE_ENV_NON_SEN_DATA: ${{ vars.BE_ENV_NON_SEN_DATA }}
+          BE_ENV_SEN_DATA: ${{ secrets.BE_ENV_SEN_DATA }}
         run: |
           echo "module.exports = {
                   apps: [
@@ -37,8 +40,8 @@ jobs:
                       name: 'backend',
                       script: 'dist/index.js',
                       env: {
-                        $(echo \"${{ vars.BE_ENV_NON_SEN_DATA }}\")
-                        $(echo \"${{ secrets.BE_ENV_SEN_DATA }}\")
+                        ${BE_ENV_NON_SEN_DATA}
+                        ${BE_ENV_SEN_DATA}
                       }
                     }
                   ]
