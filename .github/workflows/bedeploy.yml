@@ -34,18 +34,20 @@ jobs:
           BE_ENV_NON_SEN_DATA: ${{ vars.BE_ENV_NON_SEN_DATA }}
           BE_ENV_SEN_DATA: ${{ secrets.BE_ENV_SEN_DATA }}
         run: |
-          echo "module.exports = {
-                  apps: [
-                    {
-                      name: 'backend',
-                      script: 'dist/server.js',
-                      env: {
-                        ${BE_ENV_NON_SEN_DATA}
-                        ${BE_ENV_SEN_DATA}
-                      }
-                    }
-                  ]
-                };" > ./backend/ecosystem.config.js
+          cat <<EOF > ./backend/ecosystem.config.js
+          module.exports = {
+            apps: [
+              {
+                name: 'backend',
+                script: 'dist/server.js',
+                env: {
+                  ${BE_ENV_NON_SEN_DATA}
+                  ${BE_ENV_SEN_DATA}
+                }
+              }
+            ]
+          };
+          EOF
             
       - name: Building Backend
         run: |
