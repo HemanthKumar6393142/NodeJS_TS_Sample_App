@@ -26,17 +26,15 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ds.pem
           chmod 600 ~/.ssh/ds.pem
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-      
-      - name: Creating '.env' file
-        run: |
-          echo "${{ vars.FE_ENV_NON_SEN_DATA }}" > ./frontend/.env
-          echo "${{ secrets.FE_ENV_SEN_DATA }}" >> ./frontend/.env
             
       - name: Building Frontend
         run: |
           cd ./frontend
+          echo "${{ vars.FE_ENV_NON_SEN_DATA }}" > .env
+          echo "${{ secrets.FE_ENV_SEN_DATA }}" >> .env
           npm i
           npm run build
+          rm -rf .env
       
       - name: Frontend Deployment
         run: |
