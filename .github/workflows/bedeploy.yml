@@ -38,7 +38,7 @@ jobs:
                   apps: [
                     {
                       name: 'backend',
-                      script: 'dist/index.js',
+                      script: 'dist/server.js',
                       env: {
                         ${BE_ENV_NON_SEN_DATA}
                         ${BE_ENV_SEN_DATA}
