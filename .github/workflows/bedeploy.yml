@@ -28,23 +28,40 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ds.pem
           chmod 600 ~/.ssh/ds.pem
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-      
-      - name: Creating '.env' file
+            
+      - name: Creating PM2 config file to pass .env content
         run: |
-          echo "${{ vars.BE_ENV_NON_SEN_DATA }}" > ./frontend/.env
-          echo "${{ secrets.BE_ENV_SEN_DATA }}" >> ./frontend/.env
+          echo "module.exports = {
+                  apps: [
+                    {
+                      name: 'backend',
+                      script: 'dist/index.js',
+                      env: {
+                        $(echo \"${{ vars.BE_ENV_NON_SEN_DATA }}\")
+                        $(echo \"${{ secrets.BE_ENV_SEN_DATA }}\")
+                      }
+                    }
+                  ]
+                };" > ./backend/ecosystem.config.js
             
       - name: Building Backend
         run: |
           cd ./backend
-          npm i
+          echo "${{ vars.BE_ENV_NON_SEN_DATA }}" > .env
+          echo "${{ secrets.BE_ENV_SEN_DATA }}" >> .env
+          npm ci
           npm run build
+          rm -rf .env
       
-      - name: Backend Deployment
+      - name: Deploying Backend
         run: |
-          rsync -avz --delete -e "ssh -i ~/.ssh/ds.pem" ./backend/dist ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend/
+          rsync -avz --delete -e "ssh -i ~/.ssh/ds.pem" ./backend ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend/
           ssh -i ~/.ssh/ds.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} <<EOF
-            sudo pm2 start backend/dist/server.js --name backend
+            cd backend/
+            sudo pm2 delete backend
+            sudo pm2 start ecosystem.config.js
+            sudo pm2 save
+            sudo pm2 restart backend
           EOF
       
       - name: Cleanup SSH key
