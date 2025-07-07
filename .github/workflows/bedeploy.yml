@@ -70,6 +70,7 @@ jobs:
             sudo pm2 delete backend
             sudo pm2 start ecosystem.config.js
             sudo pm2 save
+            sudo rm -rf ecosystem.config.js
             sudo pm2 restart backend
           EOF
       
