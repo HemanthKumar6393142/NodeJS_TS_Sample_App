@@ -42,9 +42,9 @@ jobs:
       
       - name: Backend Deployment
         run: |
-          rsync -avz --delete -e "ssh -i ~/.ssh/ds.pem" ./backend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend/
+          rsync -avz --delete -e "ssh -i ~/.ssh/ds.pem" ./backend/dist ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend/
           ssh -i ~/.ssh/ds.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} <<EOF
-            sudo pm2 start backend/server.js --name backend
+            sudo pm2 start backend/dist/server.js --name backend
           EOF
       
       - name: Cleanup SSH key
