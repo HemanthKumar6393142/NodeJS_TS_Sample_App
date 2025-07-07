@@ -55,7 +55,7 @@ jobs:
       
       - name: Deploying Backend
         run: |
-          rsync -avz --delete -e "ssh -i ~/.ssh/ds.pem" ./backend ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend/
+          rsync -avz --delete -e "ssh -i ~/.ssh/ds.pem" ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/backend/
           ssh -i ~/.ssh/ds.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} <<EOF
             cd backend/
             sudo pm2 delete backend
